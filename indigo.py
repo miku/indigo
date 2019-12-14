@@ -1,14 +1,24 @@
 #!/usr/bin/env python
 #
 # A prototype for indigo.
+#
+# Input is newlines delimited JSON.
+#
+# TODO(martin):
+#
+# 1. Have counters for each key encountered (.top => 23, top.nested => 2, ...)
+# 2. For each key, reservoir sample values (e.g. 1000).
+# 3. For each field value sample, run type inference (string, int, float, date, ...).
+#
+# Create some post-processable representation, e.g. JSON or dataframe.
 
 import argparse
 import fileinput
 
 
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--dummy', help='dummy argument')
     parser.add_argument('files', metavar='FILE', nargs='*', help='files to read, if empty, stdin is used')
     args = parser.parse_args()
 
