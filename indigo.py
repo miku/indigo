@@ -19,6 +19,7 @@ import fileinput
 import hashlib
 import json
 import random
+import sys
 
 
 class Reservoir:
@@ -152,6 +153,14 @@ def main():
         default=1.0,
         help="probability (0-1) that a line is used for analysis",
     )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action='store_true',
+        type=bool,
+        default=False,
+        help="verbose output",
+    )
     args = parser.parse_args()
 
     # Flat counter with dotted notation.
@@ -177,6 +186,8 @@ def main():
         total += 1
         doc = json.loads(line)
         count_keys(doc, counters=counters, samples=samples)
+        if total % 1000000 == 0 and args.verbose:
+            print('{} lines done'.format(total), file=sys.stderr)
 
     result = {
         "meta": {
