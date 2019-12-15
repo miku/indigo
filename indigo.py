@@ -145,6 +145,13 @@ def main():
         default="utf-8",
         help="input encoding (for checksum)",
     )
+    parser.add_argument(
+        "-p",
+        metavar="P",
+        type=float,
+        default=1.0,
+        help="probability (0-1) that a line is used for analysis",
+    )
     args = parser.parse_args()
 
     # Flat counter with dotted notation.
@@ -162,6 +169,8 @@ def main():
     # If you would call fileinput.input() without files it would try to process all arguments.
     # We pass '-' as only file when argparse got no files which will cause fileinput to read from stdin
     for line in fileinput.input(files=args.files if len(args.files) > 0 else ("-",)):
+        if random.random() > args.p:
+            continue
         sha1.update(line.encode(args.encoding))
         if len(line.strip()) == 0:
             continue

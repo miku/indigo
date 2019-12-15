@@ -32,7 +32,7 @@ $ mkdir ~/bin && curl -sL https://git.io/JeQVu > ~/bin/indigo.py && chmod +x ~/b
 
 ```shell
 $ python indigo.py --help
-usage: indigo.py [-h] [-s N] [-e NAME] [FILE [FILE ...]]
+usage: indigo.py [-h] [-s N] [-x N] [-e NAME] [-p P] [FILE [FILE ...]]
 
 positional arguments:
   FILE                  files to read, if empty, stdin is used (default: None)
@@ -40,8 +40,12 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   -s N, --size N        reservoir sample size (default: 1024)
+  -x N, --max-length N  max length of strings to store (default: 1024)
   -e NAME, --encoding NAME
                         input encoding (for checksum) (default: utf-8)
+  -p P                  probability (0-1) that a line is used for analysis
+                        (default: 1.0)
+
 ```
 
 # TODO
