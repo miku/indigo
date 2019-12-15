@@ -15,4 +15,5 @@
 # vendor/
 
 fixtures/1k.jsonl
+fixtures/100k.jsonl
 fixtures/1m.jsonl
