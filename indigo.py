@@ -20,16 +20,18 @@ import hashlib
 import json
 import random
 
+
 class Reservoir:
     """
     Map keys to multiple values, where values are reservoir sampled.
     """
-    def __init__(self, size=1024, max_length=1024):
-        self.size = size # Reservoir size.
-        self.max_length = max_length # Max length for string fields.
 
-        self.storage = collections.defaultdict(list) # A sample (with duplicates).
-        self.uniq = collections.defaultdict(set) # Just some unique examples.
+    def __init__(self, size=1024, max_length=1024):
+        self.size = size  # Reservoir size.
+        self.max_length = max_length  # Max length for string fields.
+
+        self.storage = collections.defaultdict(list)  # A sample (with duplicates).
+        self.uniq = collections.defaultdict(set)  # Just some unique examples.
         self.counter = collections.Counter()
 
     def add(self, key, value):
@@ -37,7 +39,7 @@ class Reservoir:
 
         if isinstance(value, str):
             if len(value) > self.max_length:
-                value = '{} ({}) ...'.format(value[:self.max_length], len(value))
+                value = "{} ({}) ...".format(value[: self.max_length], len(value))
 
         if len(self.uniq[key]) < self.size:
             if isinstance(value, (str, int, float, bool)):
@@ -59,9 +61,10 @@ class Reservoir:
         return us
 
     def __str__(self):
-        return '<Reservoir with {} keys, size={}>'.format(len(self.storage), self.size)
+        return "<Reservoir with {} keys, size={}>".format(len(self.storage), self.size)
 
-def count_keys(doc, counters=None, samples=None, prefix=''):
+
+def count_keys(doc, counters=None, samples=None, prefix=""):
     """
     Given a document, update counters with names of keys, optionally prefixed by a key.
     """
@@ -72,17 +75,25 @@ def count_keys(doc, counters=None, samples=None, prefix=''):
 
     if isinstance(doc, dict):
         for k, v in doc.items():
-            key = '{}{}'.format(prefix, k)
+            key = "{}{}".format(prefix, k)
             counters[key] += 1
             if isinstance(v, dict):
-                count_keys(v, counters=counters, samples=samples, prefix='{}.'.format(key))
+                count_keys(
+                    v, counters=counters, samples=samples, prefix="{}.".format(key)
+                )
             elif isinstance(v, list):
                 for item in v:
-                    count_keys(item, counters=counters, samples=samples, prefix='{}[].'.format(key))
+                    count_keys(
+                        item,
+                        counters=counters,
+                        samples=samples,
+                        prefix="{}[].".format(key),
+                    )
             else:
                 samples.add(key, v)
     else:
         return
+
 
 class SetEncoder(json.JSONEncoder):
     """
@@ -90,6 +101,7 @@ class SetEncoder(json.JSONEncoder):
     So you can write something like this:
         json.dumps({"things": set([1, 2, 3])}, cls=SetEncoder)
     """
+
     def default(self, obj):
         """
         Decorate call to standard implementation.
@@ -98,12 +110,41 @@ class SetEncoder(json.JSONEncoder):
             return list(obj)
         return json.JSONEncoder.default(self, obj)
 
+
 def main():
-    parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('files', metavar='FILE', nargs='*', help='files to read, if empty, stdin is used')
-    parser.add_argument('-s', '--size', metavar='N', type=int, default=1024, help='reservoir sample size')
-    parser.add_argument('-x', '--max-length', metavar='N', type=int, default=1024, help='max length of strings to store')
-    parser.add_argument('-e', '--encoding', metavar='NAME', type=str, default='utf-8', help='input encoding (for checksum)')
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument(
+        "files",
+        metavar="FILE",
+        nargs="*",
+        help="files to read, if empty, stdin is used",
+    )
+    parser.add_argument(
+        "-s",
+        "--size",
+        metavar="N",
+        type=int,
+        default=1024,
+        help="reservoir sample size",
+    )
+    parser.add_argument(
+        "-x",
+        "--max-length",
+        metavar="N",
+        type=int,
+        default=1024,
+        help="max length of strings to store",
+    )
+    parser.add_argument(
+        "-e",
+        "--encoding",
+        metavar="NAME",
+        type=str,
+        default="utf-8",
+        help="input encoding (for checksum)",
+    )
     args = parser.parse_args()
 
     # Flat counter with dotted notation.
@@ -120,7 +161,7 @@ def main():
 
     # If you would call fileinput.input() without files it would try to process all arguments.
     # We pass '-' as only file when argparse got no files which will cause fileinput to read from stdin
-    for line in fileinput.input(files=args.files if len(args.files) > 0 else ('-', )):
+    for line in fileinput.input(files=args.files if len(args.files) > 0 else ("-",)):
         sha1.update(line.encode(args.encoding))
         if len(line.strip()) == 0:
             continue
@@ -129,18 +170,19 @@ def main():
         count_keys(doc, counters=counters, samples=samples)
 
     result = {
-        'meta': {
-            'size': samples.size,
-            'date': datetime.datetime.now().isoformat(),
-            'total': total,
-            'sha1': sha1.hexdigest(),
+        "meta": {
+            "size": samples.size,
+            "date": datetime.datetime.now().isoformat(),
+            "total": total,
+            "sha1": sha1.hexdigest(),
         },
-        'c': counters,
-        's': samples.storage,
-        'u': samples.unique_storage(),
-        'v': samples.uniq,
+        "c": counters,
+        "s": samples.storage,
+        "u": samples.unique_storage(),
+        "v": samples.uniq,
     }
     print(json.dumps(result, cls=SetEncoder))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
