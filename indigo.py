@@ -92,9 +92,12 @@ def main():
         doc = json.loads(line)
         count_keys(doc, counters=counters, samples=samples)
 
-    print(json.dumps(counters))
-    print(json.dumps(samples.storage))
-    print(json.dumps(samples.uniq, cls=SetEncoder))
+    result = {
+        'c': counters,
+        's': samples.storage,
+        'u': samples.uniq,
+    }
+    print(json.dumps(result, cls=SetEncoder))
 
 if __name__ == '__main__':
     main()
