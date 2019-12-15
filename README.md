@@ -5,6 +5,8 @@ Inspect files in JSON lines ([jsonl](http://jsonlines.org/),
 and will reservoir sample values.
 
 Works fine with millions of JSON documents (if they are not totally crazy).
+It's not optimized for speed, running though 4GB of JSON (1M docs) takes about
+10min.
 
 ```shell
 $ cat fixtures/1k.jsonl | python indigo.py -s 16 | jq .
