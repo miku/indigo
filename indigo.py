@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 #
-# A prototype for indigo.
+# WIP: A prototype for indigo (https://github.com/miku/indigo).
 #
-# Input is newlines delimited JSON.
+# Input is newlines delimited JSON. Output: Some report.
 #
 # TODO(martin):
 #
