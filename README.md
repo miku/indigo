@@ -1,7 +1,10 @@
 # Indigo
 
-Inspect files in JSON lines (jsonl, ndjson) format. This tool will count
-occurences of keys and will reservoir sample values.
+Inspect files in JSON lines ([jsonl](http://jsonlines.org/),
+[ndjson](http://ndjson.org/)) format. This tool will count occurences of keys
+and will reservoir sample values.
+
+Works fine with millions of JSON documents (if they are not totally crazy).
 
 ```shell
 $ cat fixtures/1k.jsonl | python indigo.py -s 16 | jq .
