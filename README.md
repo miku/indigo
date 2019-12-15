@@ -3,7 +3,7 @@
 Inspect files in JSON lines (jsonl, ndjson) format. This tool will count
 occurences of keys and will reservoir sample values.
 
-```
+```shell
 $ cat fixtures/1k.jsonl | python indigo.py -s 16 | jq .
 ```
 
@@ -30,7 +30,7 @@ $ mkdir ~/bin && curl -sL https://git.io/JeQVu > ~/bin/indigo.py && chmod +x ~/b
 
 # Usage
 
-```
+```shell
 $ python indigo.py --help
 usage: indigo.py [-h] [-s N] [-e NAME] [FILE [FILE ...]]
 
