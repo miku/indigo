@@ -94,13 +94,15 @@ class SetEncoder(json.JSONEncoder):
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('files', metavar='FILE', nargs='*', help='files to read, if empty, stdin is used')
+    parser.add_argument('-s', '--size', metavar='N', type=int, default=1024, help='reservoir sample size')
+    parser.add_argument('-e', '--encoding', metavar='NAME', type=str, default='utf-8', help='input encoding (for checksum)')
     args = parser.parse_args()
 
     # Flat counter with dotted notation.
     counters = collections.Counter()
 
     # A reservoir for examples.
-    samples = Reservoir(size=1024)
+    samples = Reservoir(size=args.size)
 
     # Total number of documents.
     total = 0
@@ -112,7 +114,7 @@ def main():
     # We pass '-' as only file when argparse got no files which will cause fileinput to read from stdin
     for line in fileinput.input(files=args.files if len(args.files) > 0 else ('-', )):
         total += 1
-        sha1.update(line.encode('utf-8'))
+        sha1.update(line.encode(args.encoding))
         doc = json.loads(line)
         count_keys(doc, counters=counters, samples=samples)
 
