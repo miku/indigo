@@ -157,7 +157,6 @@ def main():
         "-v",
         "--verbose",
         action='store_true',
-        type=bool,
         default=False,
         help="verbose output",
     )
