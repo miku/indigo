@@ -113,8 +113,10 @@ def main():
     # If you would call fileinput.input() without files it would try to process all arguments.
     # We pass '-' as only file when argparse got no files which will cause fileinput to read from stdin
     for line in fileinput.input(files=args.files if len(args.files) > 0 else ('-', )):
-        total += 1
         sha1.update(line.encode(args.encoding))
+        if len(line.strip()) == 0:
+            continue
+        total += 1
         doc = json.loads(line)
         count_keys(doc, counters=counters, samples=samples)
 
