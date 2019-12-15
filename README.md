@@ -1,4 +1,4 @@
-# indigo
+# Indigo
 
 Inspect files in JSON lines (jsonl, ndjson) format. This tool will count
 occurences of keys and will reservoir sample values.
