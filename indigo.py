@@ -190,10 +190,13 @@ def main():
 
     result = {
         "meta": {
-            "size": samples.size,
             "date": datetime.datetime.now().isoformat(),
-            "total": total,
+            "encoding": args.encoding,
+            "max_length": args.max_length,
+            "p": args.p,
             "sha1": sha1.hexdigest(),
+            "size": samples.size,
+            "total": total,
         },
         "c": counters,
         "s": samples.storage,
