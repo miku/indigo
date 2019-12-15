@@ -13,3 +13,6 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+fixtures/1k.jsonl
+fixtures/1m.jsonl
