@@ -30,7 +30,7 @@ Python 3, stdlib only, no dependencies.
 It's only a single file, at the moment:
 
 ```shell
-$ mkdir ~/bin && curl -sL https://git.io/JeQVu > ~/bin/indigo.py && chmod +x ~/bin/indigo.py
+$ mkdir -p ~/bin && curl -sL https://git.io/JeQVu > ~/bin/indigo.py && chmod +x ~/bin/indigo.py
 ```
 
 # Usage
