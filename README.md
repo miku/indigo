@@ -20,6 +20,14 @@ useful, currently.
 
 Python 3, stdlib only, no dependencies.
 
+# Installation
+
+It's only a single file, at the moment:
+
+```shell
+$ mkdir ~/bin && curl -sL https://git.io/JeQVu > ~/bin/indigo.py && chmod +x ~/bin/indigo.py
+```
+
 # Usage
 
 ```
