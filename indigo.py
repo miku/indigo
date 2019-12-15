@@ -61,6 +61,20 @@ def count_keys(doc, counters=None, samples=None, prefix=''):
         else:
             samples.add(key, v)
 
+class SetEncoder(json.JSONEncoder):
+    """
+    Helper to encode python sets into JSON lists.
+    So you can write something like this:
+        json.dumps({"things": set([1, 2, 3])}, cls=SetEncoder)
+    """
+    def default(self, obj):
+        """
+        Decorate call to standard implementation.
+        """
+        if isinstance(obj, set):
+            return list(obj)
+        return json.JSONEncoder.default(self, obj)
+
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('files', metavar='FILE', nargs='*', help='files to read, if empty, stdin is used')
@@ -70,17 +84,17 @@ def main():
     counters = collections.Counter()
 
     # A reservoir for examples.
-    samples = Reservoir(size=64)
+    samples = Reservoir(size=1024)
 
     # If you would call fileinput.input() without files it would try to process all arguments.
     # We pass '-' as only file when argparse got no files which will cause fileinput to read from stdin
     for line in fileinput.input(files=args.files if len(args.files) > 0 else ('-', )):
-        line = line.strip()
         doc = json.loads(line)
         count_keys(doc, counters=counters, samples=samples)
 
     print(json.dumps(counters))
     print(json.dumps(samples.storage))
+    print(json.dumps(samples.uniq, cls=SetEncoder))
 
 if __name__ == '__main__':
     main()
