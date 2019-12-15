@@ -36,6 +36,15 @@ optional arguments:
                         input encoding (for checksum) (default: utf-8)
 ```
 
+# TODO
+
+* [ ] stats on list values (min, max, mean, median, avg, ...)
+* [ ] stats on string fields (len -> describe, chars, conformance to known types, ...)
+* [ ] stats on ints, floats
+* [ ] an extendable data format
+* [ ] an tool to take the analysis results and generates an human readable markdown report
+* [ ] ...
+
 # Example report
 
 Reservoir sample of 16. For larger files, adjust the sample size.
