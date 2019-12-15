@@ -24,14 +24,21 @@ class Reservoir:
     """
     Map keys to multiple values, where values are reservoir sampled.
     """
-    def __init__(self, size=1024):
-        self.size = size
+    def __init__(self, size=1024, max_length=1024):
+        self.size = size # Reservoir size.
+        self.max_length = max_length # Max length for string fields.
+
         self.storage = collections.defaultdict(list) # A sample (with duplicates).
         self.uniq = collections.defaultdict(set) # Just some unique examples.
         self.counter = collections.Counter()
 
     def add(self, key, value):
         self.counter[key] += 1
+
+        if isinstance(value, str):
+            if len(value) > self.max_length:
+                value = '{} ({}) ...'.format(value[:self.max_length], len(value))
+
         if len(self.uniq[key]) < self.size:
             if isinstance(value, (str, int, float, bool)):
                 self.uniq[key].add(value)
@@ -95,6 +102,7 @@ def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('files', metavar='FILE', nargs='*', help='files to read, if empty, stdin is used')
     parser.add_argument('-s', '--size', metavar='N', type=int, default=1024, help='reservoir sample size')
+    parser.add_argument('-x', '--max-length', metavar='N', type=int, default=1024, help='max length of strings to store')
     parser.add_argument('-e', '--encoding', metavar='NAME', type=str, default='utf-8', help='input encoding (for checksum)')
     args = parser.parse_args()
 
@@ -102,7 +110,7 @@ def main():
     counters = collections.Counter()
 
     # A reservoir for examples.
-    samples = Reservoir(size=args.size)
+    samples = Reservoir(size=args.size, max_length=args.max_length)
 
     # Total number of documents.
     total = 0
