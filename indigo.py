@@ -26,7 +26,6 @@ class Reservoir:
     """
     Map keys to multiple values, where values are reservoir sampled.
     """
-
     def __init__(self, size=1024, max_length=1024):
         self.size = size  # Reservoir size.
         self.max_length = max_length  # Max length for string fields.
@@ -67,33 +66,30 @@ class Reservoir:
 
 def count_keys(doc, counters=None, samples=None, prefix=""):
     """
-    Given a document, update counters with names of keys, optionally prefixed by a key.
+    Given a document, update counters with names of keys, optionally prefixed.
     """
     if counters is None:
         counters = collections.Counter()
     if samples is None:
         samples = Reservoir()
-
-    if isinstance(doc, dict):
-        for k, v in doc.items():
-            key = "{}{}".format(prefix, k)
-            counters[key] += 1
-            if isinstance(v, dict):
-                count_keys(
-                    v, counters=counters, samples=samples, prefix="{}.".format(key)
-                )
-            elif isinstance(v, list):
-                for item in v:
-                    count_keys(
-                        item,
-                        counters=counters,
-                        samples=samples,
-                        prefix="{}[].".format(key),
-                    )
-            else:
-                samples.add(key, v)
-    else:
+    if not isinstance(doc, dict):
         return
+
+    for k, v in doc.items():
+        key = "{}{}".format(prefix, k)
+        counters[key] += 1
+        if isinstance(v, dict):
+            count_keys(v, counters=counters, samples=samples, prefix="{}.".format(key))
+        elif isinstance(v, list):
+            for item in v:
+                count_keys(
+                    item,
+                    counters=counters,
+                    samples=samples,
+                    prefix="{}[].".format(key),
+                )
+        else:
+            samples.add(key, v)
 
 
 class SetEncoder(json.JSONEncoder):
@@ -154,11 +150,7 @@ def main():
         help="probability (0-1) that a line is used for analysis",
     )
     parser.add_argument(
-        "-v",
-        "--verbose",
-        action='store_true',
-        default=False,
-        help="verbose output",
+        "-v", "--verbose", action="store_true", default=False, help="verbose output",
     )
     args = parser.parse_args()
 
@@ -185,8 +177,8 @@ def main():
         total += 1
         doc = json.loads(line)
         count_keys(doc, counters=counters, samples=samples)
-        if total % 1000000 == 0 and args.verbose:
-            print('{} lines done'.format(total), file=sys.stderr)
+        if args.verbose and total % 1000000 == 0:
+            print("{} lines done".format(total), file=sys.stderr)
 
     result = {
         "meta": {
