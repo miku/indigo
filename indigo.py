@@ -21,6 +21,11 @@ import json
 import random
 import sys
 
+try:
+    from tqdm import tqdm
+except ImportError:
+    tqdm = lambda f: f
+
 
 class Reservoir:
     """
@@ -74,26 +79,24 @@ def count_keys(doc, counters=None, samples=None, prefix=""):
     if samples is None:
         samples = Reservoir()
 
-    if isinstance(doc, dict):
-        for k, v in doc.items():
-            key = "{}{}".format(prefix, k)
-            counters[key] += 1
-            if isinstance(v, dict):
-                count_keys(
-                    v, counters=counters, samples=samples, prefix="{}.".format(key)
-                )
-            elif isinstance(v, list):
-                for item in v:
-                    count_keys(
-                        item,
-                        counters=counters,
-                        samples=samples,
-                        prefix="{}[].".format(key),
-                    )
-            else:
-                samples.add(key, v)
-    else:
+    if not isinstance(doc, dict):
         return
+
+    for k, v in doc.items():
+        key = "{}{}".format(prefix, k)
+        counters[key] += 1
+        if isinstance(v, dict):
+            count_keys(v, counters=counters, samples=samples, prefix="{}.".format(key))
+        elif isinstance(v, list):
+            for item in v:
+                count_keys(
+                    item,
+                    counters=counters,
+                    samples=samples,
+                    prefix="{}[].".format(key),
+                )
+        else:
+            samples.add(key, v)
 
 
 class SetEncoder(json.JSONEncoder):
@@ -154,11 +157,7 @@ def main():
         help="probability (0-1) that a line is used for analysis",
     )
     parser.add_argument(
-        "-v",
-        "--verbose",
-        action='store_true',
-        default=False,
-        help="verbose output",
+        "-v", "--verbose", action="store_true", default=False, help="verbose output",
     )
     args = parser.parse_args()
 
@@ -176,7 +175,7 @@ def main():
 
     # If you would call fileinput.input() without files it would try to process all arguments.
     # We pass '-' as only file when argparse got no files which will cause fileinput to read from stdin
-    for line in fileinput.input(files=args.files if len(args.files) > 0 else ("-",)):
+    for line in tqdm(fileinput.input(files=args.files if len(args.files) > 0 else ("-",))):
         if random.random() > args.p:
             continue
         sha1.update(line.encode(args.encoding))
@@ -186,7 +185,7 @@ def main():
         doc = json.loads(line)
         count_keys(doc, counters=counters, samples=samples)
         if total % 1000000 == 0 and args.verbose:
-            print('{} lines done'.format(total), file=sys.stderr)
+            print("{} lines done".format(total), file=sys.stderr)
 
     result = {
         "meta": {
