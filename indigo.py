@@ -175,7 +175,9 @@ def main():
 
     # If you would call fileinput.input() without files it would try to process all arguments.
     # We pass '-' as only file when argparse got no files which will cause fileinput to read from stdin
-    for line in tqdm(fileinput.input(files=args.files if len(args.files) > 0 else ("-",))):
+    for line in tqdm(
+        fileinput.input(files=args.files if len(args.files) > 0 else ("-",))
+    ):
         if random.random() > args.p:
             continue
         sha1.update(line.encode(args.encoding))
